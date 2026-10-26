@@ -1,0 +1,25 @@
+building_id,name,type,zone,sqft,meters,completeness_pct
+B01,Lab 1,lab,SG-North,61000,8,100.0
+B02,Classroom 1,classroom,SG-Central,175000,12,100.0
+B03,Lab 2,lab,SG-East,123000,11,100.0
+B04,Classroom 2,classroom,SG-South,83000,13,100.0
+B05,Residential 1,residential,SG-North,63000,8,100.0
+B06,Office 1,office,SG-Central,40000,8,100.0
+B07,Classroom 3,classroom,SG-East,30000,7,100.0
+B08,Residential 2,residential,SG-South,55000,10,100.0
+B09,Classroom 4,classroom,SG-North,73000,10,100.0
+B10,Library 1,library,SG-Central,107000,11,100.0
+B11,Office 2,office,SG-East,86000,8,100.0
+B12,Office 3,office,SG-South,32000,9,100.0
+B13,Recreation 1,recreation,SG-North,47000,11,100.0
+B14,Classroom 5,classroom,SG-Central,27000,9,100.0
+B15,Lab 3,lab,SG-East,31000,9,100.0
+B16,Residential 3,residential,SG-South,71000,10,100.0
+B17,Library 2,library,SG-North,123000,11,100.0
+B18,Recreation 2,recreation,SG-Central,48000,7,100.0
+B19,Office 4,office,SG-East,161000,11,100.0
+B20,Office 5,office,SG-South,178000,12,100.0
+B21,Lab 4,lab,SG-North,120000,10,100.0
+B22,Residential 4,residential,SG-Central,32000,8,100.0
+B23,Lab 5,lab,SG-East,53000,12,99.99
+B24,Lab 6,lab,SG-South,104000,11,100.0

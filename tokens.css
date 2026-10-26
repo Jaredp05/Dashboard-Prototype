@@ -1,0 +1,70 @@
+/* Design tokens. Light by default, dark when the OS asks for it or when
+   <html data-theme="dark"> is set. Component styles in dashboard.css only use these. */
+:root {
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+
+  --color-bg: #f4f6f7;
+  --color-panel: #ffffff;
+  --color-fg: #17202a;
+  --color-fg-muted: #5d6b78;
+  --color-border-line: #dde3e8;
+  --color-ok: #1d7a46;
+  --color-warn: #a35a00;
+  --color-bad: #c0352b;
+
+  --cds-chart-grid: #e8edf0;
+  --cds-chart-axis: #b5c0c9;
+  --cds-chart-reference: #7f8c98;
+  --cds-chart-muted: #a7b2bb;
+  --cds-chart-status-critical: #d1453a;
+  --cds-surface-popover: #ffffff;
+  --cds-border: #d3dae0;
+  --cds-shadow-popover: 0 6px 20px rgba(23, 32, 42, .12);
+  --cds-text-secondary: #5d6b78;
+
+  --cds-font-size-caption: .78rem;
+  --cds-font-size-body: .92rem;
+  --cds-font-size-heading: 1.05rem;
+  --cds-font-size-title: 1.9rem;
+  --cds-font-weight-medium: 600;
+
+  --cds-gap-xs: 4px;  --cds-gap-sm: 8px;  --cds-gap-md: 14px;  --cds-gap-lg: 22px;  --cds-gap-xl: 32px;
+  --cds-pad-xs: 4px;  --cds-pad-sm: 8px;  --cds-pad-md: 12px;  --cds-pad-lg: 18px;  --cds-pad-xl: 28px;
+  --cds-radius: 8px;
+  --cds-dur-slow: 320ms;
+  --cds-ease-out: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #0f1418; --color-panel: #171e24; --color-fg: #e6ecf0; --color-fg-muted: #93a1ad;
+    --color-border-line: #26313a; --color-ok: #5cc98a; --color-warn: #f0a94a; --color-bad: #ff7b6e;
+    --cds-chart-grid: #222c34; --cds-chart-axis: #3a4752; --cds-chart-reference: #8795a1; --cds-chart-muted: #5b6874;
+    --cds-chart-status-critical: #ff6f61; --cds-surface-popover: #1d252c; --cds-border: #2f3b45;
+    --cds-shadow-popover: 0 6px 20px rgba(0, 0, 0, .45); --cds-text-secondary: #93a1ad;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --color-bg: #0f1418; --color-panel: #171e24; --color-fg: #e6ecf0; --color-fg-muted: #93a1ad;
+  --color-border-line: #26313a; --color-ok: #5cc98a; --color-warn: #f0a94a; --color-bad: #ff7b6e;
+  --cds-chart-grid: #222c34; --cds-chart-axis: #3a4752; --cds-chart-reference: #8795a1; --cds-chart-muted: #5b6874;
+  --cds-chart-status-critical: #ff6f61; --cds-surface-popover: #1d252c; --cds-border: #2f3b45;
+  --cds-shadow-popover: 0 6px 20px rgba(0, 0, 0, .45); --cds-text-secondary: #93a1ad;
+  color-scheme: dark;
+}
+
+/* Page shell */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--color-bg); color: var(--color-fg); font-family: var(--font-sans); font-size: 15px; line-height: 1.45; }
+.page { max-width: 1440px; margin-inline: auto; padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 900px) { .page { padding-left: 32px; padding-right: 32px; } }
+[hidden] { display: none !important; }
+
+/* Loading placeholder */
+.skeleton { position: relative; color: transparent !important; border-radius: var(--cds-radius); background: linear-gradient(90deg, var(--cds-chart-grid) 25%, var(--color-border-line) 50%, var(--cds-chart-grid) 75%); background-size: 200% 100%; }
+span.skeleton, p .skeleton { display: inline-block; min-width: 4ch; }
+@media (prefers-reduced-motion: no-preference) { .skeleton { animation: skel 1.4s linear infinite; } @keyframes skel { to { background-position: -200% 0; } } }
