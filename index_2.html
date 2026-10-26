@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>DERConnect Anomaly Ops</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400&display=swap">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<main class="page">
+
+
+<div class="ops" id="top">
+  <header class="ops-head">
+    <h1 class="ops-title">DERConnect anomaly operations</h1>
+    <p class="ops-take" id="takeaway"><span class="skeleton">—</span></p>
+    <p class="ops-note" id="period-note">Simulated campus data: 24 buildings and 236 submeters in four sub-grids, 15-minute readings. Not real DERConnect measurements.</p>
+  </header>
+
+  <div class="ops-filters" id="filters" role="group" aria-label="Filters">
+    <label class="ops-field"><span class="ops-field-label">Sub-grid</span>
+      <select class="ops-select" id="f-zone"><option value="all">All sub-grids</option></select>
+    </label>
+    <div class="ops-field"><span class="ops-field-label">Anomaly type (Lai et al.)</span>
+      <div class="ops-chips" id="f-types"></div>
+    </div>
+    <div class="ops-field"><span class="ops-field-label">Status</span>
+      <div class="ops-seg" id="f-status"><button type="button" data-v="all">All</button><button type="button" data-v="active">Active now</button><button type="button" data-v="open">Open</button><button type="button" data-v="resolved">Resolved</button></div>
+    </div>
+    <div class="ops-field"><span class="ops-field-label">Period</span>
+      <div class="ops-seg" id="f-range"><button type="button" data-v="7">7 days</button><button type="button" data-v="30">30 days</button><button type="button" data-v="all">10 weeks</button></div>
+    </div>
+    <div class="ops-field"><span class="ops-field-label">Resolution</span>
+      <div class="ops-seg" id="f-grain"><button type="button" data-v="hour">Hourly</button><button type="button" data-v="day">Daily</button><button type="button" data-v="week">Weekly</button></div>
+    </div>
+    <label class="ops-field ops-check"><input type="checkbox" id="f-explained"> Show explained events</label>
+    <button type="button" class="ops-btn" id="f-reset">Reset</button>
+  </div>
+
+  <section class="ops-kpis" id="kpis" aria-label="Headline figures">
+    <div class="ops-tile" id="kpi-active"><span class="ops-tile-label ops-live"><i class="ops-pulse"></i>Active right now</span><span class="ops-tile-value skeleton" data-field="active_now">—</span><span class="ops-tile-sub">Still in progress at the latest reading</span></div>
+    <div class="ops-tile" id="kpi-open"><span class="ops-tile-label">Open anomalies</span><span class="ops-tile-value skeleton" data-field="open_anomalies">—</span><span class="ops-tile-sub">New or under investigation</span></div>
+    <div class="ops-tile" id="kpi-high"><span class="ops-tile-label">High severity, open</span><span class="ops-tile-value skeleton" data-field="high_open">—</span><span class="ops-tile-sub">Large waste or a whole sub-grid</span></div>
+    <div class="ops-tile" id="kpi-bldg"><span class="ops-tile-label">Buildings affected</span><span class="ops-tile-value skeleton" data-field="buildings_affected">—</span><span class="ops-tile-sub">With at least one open anomaly</span></div>
+    <div class="ops-tile" id="kpi-kwh"><span class="ops-tile-label">Excess energy from anomalies</span><span><span class="ops-tile-value skeleton" data-field="excess_kwh">—</span><span class="ops-tile-unit">kWh</span></span><span class="ops-tile-sub">All fault events, 10 weeks</span></div>
+    <div class="ops-tile" id="kpi-data"><span class="ops-tile-label">Meter data received</span><span><span class="ops-tile-value skeleton" data-field="completeness_pct">—</span><span class="ops-tile-unit">%</span></span><span class="ops-tile-sub">Share of expected readings</span></div>
+  </section>
+
+  <section class="ops-card" id="now">
+    <div class="ops-card-head"><div><h2>Happening now</h2>
+      <p class="ops-sub" id="now-sub">Faults still in progress at the latest reading. Click one for details.</p></div></div>
+    <div class="ops-now skeleton" id="now-list" style="min-height:96px"></div>
+  </section>
+
+  <section class="ops-card" id="subgrid">
+    <div class="ops-card-head">
+      <div><h2 id="subgrid-title">Sub-grid load vs expected</h2>
+      <p class="ops-sub">Average kW. Expected is the median of the same weekday and time over the previous 4 weeks. The dotted line marks the latest reading. Shaded spans are sub-grid or campus events. Tick marks along the bottom are building and meter events; click one to open it.</p></div>
+    </div>
+    <div class="ops-chart skeleton" id="subgrid-chart" style="min-height:260px"></div>
+    <p class="ops-mini-h" style="margin-top:var(--cds-gap-md)">Outdoor temperature</p>
+    <div class="ops-chart skeleton" id="temp-chart" style="min-height:90px"></div>
+    <div class="ops-legend"><span><i class="ops-key-line"></i>Measured</span><span><i class="ops-key-line is-dashed"></i>Expected</span><span id="subgrid-key"></span></div>
+  </section>
+
+  <div class="ops-row">
+    <section class="ops-card ops-wide" id="heatmap">
+      <div class="ops-card-head"><div><h2>Buildings by day</h2>
+        <p class="ops-sub">Daily energy compared with expected. Darker means a bigger gap. Dots mark days with a fault event. Click a row to open that building below.</p></div></div>
+      <div class="ops-chart skeleton" id="heatmap-chart" style="min-height:360px"></div>
+      <div class="ops-legend" id="heatmap-key"></div>
+    </section>
+    <section class="ops-card" id="mix">
+      <div class="ops-card-head"><div><h2>What kind of anomalies</h2>
+        <p class="ops-sub">Event counts in the selected sub-grid. Solid bars are faults, light bars are explained events. Click a type to filter.</p></div></div>
+      <div class="ops-mix">
+        <div><p class="ops-mini-h">By anomaly type</p><div class="ops-mix-list" id="mix-types"></div></div>
+        <div><p class="ops-mini-h">By category</p><div class="ops-mix-list" id="mix-cats"></div></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="ops-card" id="events">
+    <div class="ops-card-head"><div><h2>Events</h2>
+      <p class="ops-sub">Faults to act on and explained events for context. Excess kWh is measured energy minus what the building would have used without the fault. Click a row for details.</p></div></div>
+    <div class="ops-tablebar"><input class="ops-search" id="ev-search" type="search" placeholder="Search events" aria-label="Search events"><span class="ops-count" id="ev-count"></span></div>
+    <div class="ops-tablewrap">
+      <table class="ops-table" id="ev-table">
+        <thead><tr>
+          <th data-field="event_id"><button type="button" data-k="event_id">Event</button></th>
+          <th data-field="severity"><button type="button" data-k="severity">Severity</button></th>
+          <th data-field="status"><button type="button" data-k="status">Status</button></th>
+          <th data-field="lai_type"><button type="button" data-k="lai_type">Type</button></th>
+          <th data-field="category" class="ops-hide-narrow"><button type="button" data-k="category">Category</button></th>
+          <th data-field="location"><button type="button" data-k="location">Where</button></th>
+          <th data-field="start" class="ops-hide-narrow"><button type="button" data-k="start">Start</button></th>
+          <th data-field="duration_h" class="is-num ops-hide-narrow"><button type="button" data-k="duration_h">Hours</button></th>
+          <th data-field="peak_dev_pct" class="is-num ops-hide-narrow"><button type="button" data-k="peak_dev_pct">Peak dev. %</button></th>
+          <th data-field="excess_kwh" class="is-num"><button type="button" data-k="excess_kwh">Excess kWh</button></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="ops-card" id="detail">
+    <div class="ops-card-head"><div><h2 id="detail-title">Event details</h2>
+      <p class="ops-sub" id="detail-sub">Select an event in the table, the chart ticks or the scatter.</p></div>
+      <div class="ops-badges" id="detail-badges"></div></div>
+    <div class="ops-detail">
+      <div class="ops-detail-charts">
+        <div><p class="ops-mini-h">Measured vs expected around the event</p>
+          <p class="ops-mini-sub" id="trace-sub">A dot marks a point outlier. A shaded span marks an outlier that lasts.</p>
+          <div class="ops-chart skeleton" id="trace-chart" style="min-height:240px"></div></div>
+        <div><p class="ops-mini-h">Event day vs the same weekday in earlier weeks</p>
+          <p class="ops-mini-sub" id="overlay-sub">How the worst day compares with comparable days.</p>
+          <div class="ops-chart skeleton" id="overlay-chart" style="min-height:200px"></div>
+          <div class="ops-legend" id="overlay-key"></div></div>
+      </div>
+      <div class="ops-detail-side">
+        <p class="ops-why" id="detail-why"></p>
+        <dl class="ops-facts" id="detail-facts"></dl>
+        <div class="ops-box" id="detail-box"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ops-card" id="severity">
+    <div class="ops-card-head"><div><h2>Magnitude vs duration</h2>
+      <p class="ops-sub">Each circle is an event. Circle size is excess energy. Short tall spikes sit top left, slow costly drifts sit right. Hollow circles are explained events.</p></div></div>
+    <div class="ops-chart skeleton" id="scatter-chart" style="min-height:300px"></div>
+  </section>
+
+  <section class="ops-card" id="building">
+    <div class="ops-card-head"><div><h2 id="b-title">Building drill-down</h2>
+      <p class="ops-sub">Load against expected, which loads use the energy, and which part of the pattern broke.</p></div>
+      <label class="ops-field"><span class="ops-field-label">Building</span><select class="ops-select" id="f-building"></select></label></div>
+    <div class="ops-bfacts" id="b-facts"></div>
+    <div class="ops-bgrid">
+      <div><p class="ops-mini-h">Load vs expected</p><p class="ops-mini-sub">Average kW. Shaded spans are this building's events.</p>
+        <div class="ops-chart skeleton" id="b-chart" style="min-height:240px"></div>
+        <div class="ops-legend"><span><i class="ops-key-line"></i>Measured</span><span><i class="ops-key-line is-dashed"></i>Expected</span></div></div>
+      <div><p class="ops-mini-h">Daily energy by load type</p><p class="ops-mini-sub">kWh per day from the AHU, lighting, plug and miscellaneous submeters.</p>
+        <div class="ops-chart skeleton" id="b-break" style="min-height:240px"></div>
+        <div class="ops-legend" id="b-break-key"></div></div>
+    </div>
+    <div style="margin-top:var(--cds-gap-lg)"><p class="ops-mini-h">Decomposition</p>
+      <p class="ops-mini-sub">Hourly load split into a 7-day trend, the repeating weekly pattern, and what is left over. A drift shows in the trend, a broken rhythm and one-off faults show in the residual.</p>
+      <div class="ops-decomp">
+        <div><p class="ops-mini-sub">Trend (kW)</p><div class="ops-chart skeleton" id="d-trend" style="min-height:110px"></div></div>
+        <div><p class="ops-mini-sub">Weekly pattern (kW above or below trend)</p><div class="ops-chart skeleton" id="d-season" style="min-height:110px"></div></div>
+        <div><p class="ops-mini-sub">Residual (kW)</p><div class="ops-chart skeleton" id="d-resid" style="min-height:120px"></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+</main>
+<script src="d3.min.js"></script><!-- d3 v7, bundled so the page works offline -->
+<script type="module" src="app.js"></script>
+</body>
+</html>
