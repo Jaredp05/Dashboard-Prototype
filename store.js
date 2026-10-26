@@ -1,23 +1,23 @@
 /* Data loading, derived figures and filter state for the dashboard.
-   Swap the CSV paths in DATASETS for an API later; everything else reads through `store`. */
-
+   Flat layout: every file sits next to index.html. Swap the CSV paths in DATASETS for an API later; everything else reads through `store`. */
+ 
 const DATASETS = {
-  events: 'data/events.csv',
-  buildings: 'data/buildings.csv',
-  zone_hourly: 'data/zone_hourly.csv',
-  building_hourly: 'data/building_hourly.csv',
-  building_daily: 'data/building_daily.csv',
-  event_traces: 'data/event_traces.csv',
-  event_overlay: 'data/event_overlay.csv',
+  events: 'events.csv',
+  buildings: 'buildings.csv',
+  zone_hourly: 'zone_hourly.csv',
+  building_hourly: 'building_hourly.csv',
+  building_daily: 'building_daily.csv',
+  event_traces: 'event_traces.csv',
+  event_overlay: 'event_overlay.csv',
 };
-
+ 
 // Filter defaults. "types: []" means every anomaly type.
 const DEFAULTS = { zone: 'all', types: [], status: 'all', explained: true, range: '7', grain: 'hour', event: null, building: null };
-
+ 
 // One fixed color per Lai anomaly type (0-5), then two spares used by the heatmap and extras.
 // Okabe-Ito based, readable for common color-vision deficiencies.
 const COLORS = ['#D55E00', '#0072B2', '#CC79A7', '#E69F00', '#009E73', '#8C6BB1', '#56B4E9', '#3C8DBC'];
-
+ 
 // ---------- derived figures (formerly dashboard calculations)
 function computeKpis(events, buildings) {
     const zones = ['all', ...new Set(buildings.map((b) => b.zone))];
@@ -50,7 +50,7 @@ function computeKpis(events, buildings) {
       };
     });
 }
-
+ 
 function computeMix(events) {
     const zones = ['all', ...new Set(events.map((e) => e.zone).filter((z) => z !== 'All zones'))];
     const out = [];
@@ -65,18 +65,18 @@ function computeMix(events) {
     }
     return out;
 }
-
+ 
 // ---------- store
 const data = {};
 const listeners = new Set();
 let params = { ...DEFAULTS, ...readHash() };
 let frame = 0;
-
+ 
 function emit() {
   cancelAnimationFrame(frame);
   frame = requestAnimationFrame(() => { writeHash(); listeners.forEach((fn) => fn()); });
 }
-
+ 
 // Filters live in the URL hash so a view can be bookmarked or sent (e.g. #zone=SG-East&range=30).
 function readHash() {
   const out = {};
@@ -98,7 +98,7 @@ function writeHash() {
   const h = q.toString();
   history.replaceState(null, '', h ? `#${h}` : location.pathname + location.search);
 }
-
+ 
 export const store = {
   colors: COLORS,
   params: () => ({ ...params }),
@@ -108,16 +108,16 @@ export const store = {
   data: (id) => data[id] || { status: 'loading', data: [] },
   onData(fn) { listeners.add(fn); fn(); },
 };
-
+ 
 function set(id, value) { data[id] = value; emit(); }
-
+ 
 async function load() {
   await Promise.all(Object.entries(DATASETS).map(async ([id, url]) => {
     try { set(id, { status: 'ok', data: await d3.csv(url) }); }
     catch (err) { console.error(`Could not load ${url}`, err); set(id, { status: 'error', data: [], message: String(err) }); }
   }));
 }
-
+ 
 // Derived figures recompute once their inputs have loaded.
 listeners.add(() => {
   const ev = data.events, bl = data.buildings;
@@ -128,6 +128,7 @@ listeners.add(() => {
   }
   if ((ev?.status === 'error' || bl?.status === 'error') && !data.kpis) data.kpis = data.mix = { status: 'error', data: [] };
 });
-
+ 
 window.addEventListener('resize', () => emit());
 load();
+ 
